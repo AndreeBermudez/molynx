@@ -1,0 +1,351 @@
+{
+  "name": "agent-review",
+  "displayName": "Agent Review",
+  "description": "Revisa los cambios de Codex, Claude Code y agent-harness bloque por bloque: aceptar o rechazar cada cambio dentro del editor.",
+  "version": "0.7.0",
+  "publisher": "AndreeBermudez",
+  "author": "AndreeBermudez",
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "configurationDefaults": {
+      "diffEditor.codeLens": true,
+      "diffEditor.renderGutterMenu": false
+    },
+    "configuration": {
+      "title": "Agent Review",
+      "properties": {
+        "agentReview.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Revisar cada cambio del agente antes de darlo por bueno. Desactivado, el hook de Claude Code no registra nada y los cambios se aplican directo."
+        },
+        "agentReview.accentColor": {
+          "type": "string",
+          "default": "#3794ff",
+          "description": "Color del ícono de la barra inferior."
+        },
+        "agentReview.viewMode": {
+          "type": "string",
+          "enum": [
+            "diff",
+            "editor"
+          ],
+          "enumDescriptions": [
+            "Editor de diferencias: lo eliminado se ve como líneas en rojo y lo nuevo en verde.",
+            "Editor normal: solo se resaltan las líneas nuevas; lo anterior se ve al pasar el mouse."
+          ],
+          "default": "diff",
+          "description": "Dónde se revisan los bloques."
+        },
+        "agentReview.roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Raíces de agent-harness (carpeta que contiene .agents/harness). Vacío: se buscan en cada carpeta del workspace y sus padres."
+        },
+        "agentReview.autoOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Abrir la revisión en cuanto el agente cambia un archivo."
+        },
+        "agentReview.pollIntervalMs": {
+          "type": "number",
+          "default": 1500,
+          "minimum": 500,
+          "description": "Cada cuánto se revisan las carpetas de propuestas."
+        },
+        "agentReview.saveOnResolve": {
+          "type": "boolean",
+          "default": true,
+          "description": "Guardar el archivo cuando ya no quedan bloques pendientes."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "agentReview.acceptHunk",
+        "title": "Aceptar bloque",
+        "category": "Agent Review",
+        "icon": "$(check)"
+      },
+      {
+        "command": "agentReview.rejectHunk",
+        "title": "Rechazar bloque",
+        "category": "Agent Review",
+        "icon": "$(close)"
+      },
+      {
+        "command": "agentReview.acceptAll",
+        "title": "Aceptar todos los bloques",
+        "category": "Agent Review",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "agentReview.rejectAll",
+        "title": "Rechazar todos los bloques",
+        "category": "Agent Review",
+        "icon": "$(close-all)"
+      },
+      {
+        "command": "agentReview.nextHunk",
+        "title": "Siguiente bloque",
+        "category": "Agent Review",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "agentReview.previousHunk",
+        "title": "Bloque anterior",
+        "category": "Agent Review",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "agentReview.openNext",
+        "title": "Abrir siguiente revisión pendiente",
+        "category": "Agent Review"
+      },
+      {
+        "command": "agentReview.showDiff",
+        "title": "Ver diff completo",
+        "category": "Agent Review",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "agentReview.dismiss",
+        "title": "Descartar revisión",
+        "category": "Agent Review",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "agentReview.refresh",
+        "title": "Actualizar",
+        "category": "Agent Review",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "agentReview.toggle",
+        "title": "Activar/desactivar revisión",
+        "category": "Agent Review",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "agentReview.enable",
+        "title": "Activar revisión",
+        "category": "Agent Review"
+      },
+      {
+        "command": "agentReview.disable",
+        "title": "Desactivar revisión",
+        "category": "Agent Review"
+      },
+      {
+        "command": "agentReview.menu",
+        "title": "Mostrar cambios pendientes",
+        "category": "Agent Review",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "agentReview.help",
+        "title": "Cómo funciona",
+        "category": "Agent Review",
+        "icon": "$(question)"
+      },
+      {
+        "command": "agentReview.connectClaude",
+        "title": "Conectar con Claude Code",
+        "category": "Agent Review",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "agentReview.disconnectClaude",
+        "title": "Desconectar de Claude Code",
+        "category": "Agent Review",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "agentReview.connectCodex",
+        "title": "Conectar con Codex",
+        "category": "Agent Review",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "agentReview.disconnectCodex",
+        "title": "Desconectar de Codex",
+        "category": "Agent Review",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "agentReview.thread.accept",
+        "title": "Aceptar este bloque (Ctrl+Alt+Y)",
+        "icon": {
+          "light": "media/accept.svg",
+          "dark": "media/accept.svg"
+        }
+      },
+      {
+        "command": "agentReview.thread.reject",
+        "title": "Rechazar este bloque (Ctrl+Alt+N)",
+        "icon": {
+          "light": "media/reject.svg",
+          "dark": "media/reject.svg"
+        }
+      },
+      {
+        "command": "agentReview.thread.acceptAll",
+        "title": "Aceptar todos los cambios del archivo",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "agentReview.thread.rejectAll",
+        "title": "Rechazar todos los cambios del archivo",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "agentReview.thread.previous",
+        "title": "Bloque anterior",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "agentReview.thread.next",
+        "title": "Bloque siguiente",
+        "icon": "$(arrow-down)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "agentReview.acceptHunk",
+        "key": "ctrl+alt+y",
+        "mac": "cmd+alt+y",
+        "when": "editorTextFocus && agentReview.cursorInHunk"
+      },
+      {
+        "command": "agentReview.rejectHunk",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus && agentReview.cursorInHunk"
+      },
+      {
+        "command": "agentReview.nextHunk",
+        "key": "ctrl+alt+]",
+        "mac": "cmd+alt+]",
+        "when": "editorTextFocus && agentReview.fileHasHunks"
+      },
+      {
+        "command": "agentReview.previousHunk",
+        "key": "ctrl+alt+[",
+        "mac": "cmd+alt+[",
+        "when": "editorTextFocus && agentReview.fileHasHunks"
+      }
+    ],
+    "menus": {
+      "comments/commentThread/title": [
+        {
+          "command": "agentReview.thread.accept",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@1"
+        },
+        {
+          "command": "agentReview.thread.reject",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@2"
+        },
+        {
+          "command": "agentReview.thread.acceptAll",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@3"
+        },
+        {
+          "command": "agentReview.thread.rejectAll",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@4"
+        },
+        {
+          "command": "agentReview.thread.previous",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@5"
+        },
+        {
+          "command": "agentReview.thread.next",
+          "when": "commentController == agentReview && commentThread == agentReviewHunk",
+          "group": "inline@6"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "agentReview.previousHunk",
+          "when": "agentReview.fileHasHunks",
+          "group": "navigation@1"
+        },
+        {
+          "command": "agentReview.nextHunk",
+          "when": "agentReview.fileHasHunks",
+          "group": "navigation@2"
+        },
+        {
+          "command": "agentReview.acceptAll",
+          "when": "agentReview.fileHasHunks",
+          "group": "navigation@3"
+        },
+        {
+          "command": "agentReview.rejectAll",
+          "when": "agentReview.fileHasHunks",
+          "group": "navigation@4"
+        },
+        {
+          "command": "agentReview.help",
+          "when": "agentReview.fileHasHunks",
+          "group": "navigation@5"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "agentReview.acceptHunk",
+          "when": "agentReview.cursorInHunk"
+        },
+        {
+          "command": "agentReview.rejectHunk",
+          "when": "agentReview.cursorInHunk"
+        },
+        {
+          "command": "agentReview.dismiss",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.accept",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.reject",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.acceptAll",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.rejectAll",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.previous",
+          "when": "false"
+        },
+        {
+          "command": "agentReview.thread.next",
+          "when": "false"
+        }
+      ]
+    }
+  }
+}
