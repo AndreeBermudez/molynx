@@ -6,6 +6,10 @@
   "publisher": "AndreeBermudez",
   "author": "AndreeBermudez",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndreeBermudez/agent-review.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
