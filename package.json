@@ -1,11 +1,12 @@
 {
 	"name": "molynx",
 	"displayName": "Molynx",
-	"description": "Revisa los cambios de Codex, Claude Code y agent-harness bloque por bloque: aceptar o rechazar cada cambio dentro del editor.",
-	"version": "0.7.0",
+	"description": "Revisa los cambios de Codex y Claude Code bloque por bloque: acepta o rechaza cada cambio dentro del editor.",
+	"version": "0.7.1",
 	"publisher": "AndreeBermdez",
 	"author": "AndreeBermudez",
 	"license": "MIT",
+	"icon": "media/icon.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/AndreeBermudez/agent-review.git"
