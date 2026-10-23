@@ -1,4 +1,4 @@
-# Agent Review
+# Molynx
 
 Extensión para VS Code y forks compatibles (Antigravity, Cursor, Windsurf) que
 te deja revisar bloque por bloque los cambios de un agente de IA, al estilo de
@@ -8,7 +8,7 @@ Autor: AndreeBermudez.
 
 ## Así funciona
 
-![Agent Review muestra los cambios de un agente y permite revisarlos bloque por bloque](media/capturas/funcionalidad.png)
+![Molynx muestra los cambios de un agente y permite revisarlos bloque por bloque](media/capturas/funcionalidad.png)
 
 ## Fuentes de cambios
 
