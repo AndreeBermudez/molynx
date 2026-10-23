@@ -6,6 +6,10 @@ Copilot: cada bloque se acepta o se rechaza dentro del editor.
 
 Autor: AndreeBermudez.
 
+## Así funciona
+
+![Agent Review muestra los cambios de un agente y permite revisarlos bloque por bloque](media/capturas/funcionalidad.png)
+
 ## Fuentes de cambios
 
 | Fuente | Cómo llega | Disco |
@@ -55,21 +59,26 @@ La primera vez aparece un aviso con la ayuda; después está en el `?` y en el m
 | `Ctrl+Alt+N` | Rechazar el bloque bajo el cursor |
 | `Ctrl+Alt+]` / `Ctrl+Alt+[` | Siguiente / anterior bloque |
 
-## Instalación
+## Instalar la extensión
 
-### 1. Extensión
-
-Es JavaScript plano, sin dependencias ni compilación. Para empaquetarla:
+En VS Code abre **Extensions** → menú **…** → **Install from VSIX…** y elige
+el archivo `.vsix` de la extensión. Si usas perfiles, instálala en el perfil
+con el que abres tu proyecto:
 
 ```powershell
-cd agent-review
-npx @vscode/vsce package --allow-missing-repository --skip-license
+code --install-extension <archivo.vsix> --profile "<perfil>"
 ```
 
-Después: *Extensions → … → Install from VSIX…*. Si usas perfiles de VS Code,
-instálala en el perfil del workspace (`code --install-extension <vsix> --profile "<perfil>"`).
+Para generar el VSIX desde el código fuente, abre una terminal en la carpeta
+que contiene `package.json` y ejecuta:
 
-### 2. Conectar Claude Code
+```powershell
+npx @vscode/vsce package
+```
+
+Esto crea un archivo `.vsix` que puedes instalar siguiendo los pasos anteriores.
+
+## Conectar Claude Code
 
 En VS Code ejecuta **Agent Review: Conectar con Claude Code** desde `Ctrl+Shift+P`
 y confirma. La extensión copia el hook a `~/.agent-review/snapshot.js` y lo
@@ -89,7 +98,7 @@ en el latido). Así Claude Code no muestra su propia aprobación y la revisión 
 hace solo con Agent Review. Fuera del workspace, o con la revisión desactivada,
 el hook no responde nada y Claude Code pide permiso como siempre.
 
-### Hook de Codex
+## Conectar Codex
 
 En VS Code ejecuta **Agent Review: Conectar con Codex**. Se agrega un hook
 `PreToolUse` para `apply_patch` en `~/.codex/hooks.json`; luego reinicia Codex y
