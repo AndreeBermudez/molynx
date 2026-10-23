@@ -12,12 +12,6 @@ Autor: AndreeBermudez.
 | --- | --- | --- |
 | **Codex** (`apply_patch`) | Hook `PreToolUse` que registra el archivo antes del parche | El cambio ya está aplicado; rechazar lo revierte |
 | **Claude Code** (`Edit`, `Write`, `MultiEdit`) | Hook `PreToolUse` que guarda una copia del archivo antes de editar | El cambio ya está aplicado; rechazar lo revierte |
-| **agent-harness** (`harness_replace`, `harness_write`) | El mismo hook | Igual que Claude Code |
-| **agent-harness** (`harness_proposal`) | Registro en `.agents/harness/proposals` | No cambia hasta que aceptas |
-
-La extensión no depende del harness: con solo el hook ya revisa los cambios de
-Claude Code.
-
 
 La extensión revisa cambios de Codex hechos con `apply_patch`. Los cambios que
 Codex ejecuta mediante comandos de terminal no se capturan automáticamente.
@@ -86,9 +80,8 @@ Después, en Claude Code abre `/hooks` una vez o reinicia la sesión para que
 cargue el hook. Requiere Node.js instalado y disponible en el `PATH`.
 
 El hook nunca bloquea la herramienta: si algo falla, sale en silencio. Si
-prefieres configurarlo a mano, agrega el hook `PreToolUse` para `Edit|Write|MultiEdit`
-y las herramientas `mcp__agent-harness__harness_replace` y
-`mcp__agent-harness__harness_write` en `~/.claude/settings.json`.
+prefieres configurarlo a mano, agrega el hook `PreToolUse` para
+`Edit|Write|MultiEdit` en `~/.claude/settings.json`.
 
 Con Agent Review activo, el hook responde `permissionDecision: "allow"` para los
 archivos dentro de las carpetas del workspace abierto (la extensión las publica
@@ -114,7 +107,6 @@ en VS Code.
 | `agentReview.autoOpen` | `true` | Abrir la revisión en cuanto llega un cambio. |
 | `agentReview.saveOnResolve` | `true` | Guardar al resolver el último bloque. |
 | `agentReview.pollIntervalMs` | `1500` | Intervalo de revisión de las carpetas. |
-| `agentReview.roots` | `[]` | Raíces de agent-harness; vacío = autodetección. |
 
 La extensión activa `diffEditor.codeLens` para que los botones aparezcan en el
 editor de diferencias, y apaga `diffEditor.renderGutterMenu` (la flecha ↺ del
