@@ -5,7 +5,7 @@
   "version": "0.7.0",
   "publisher": "AndreeBermudez",
   "author": "AndreeBermudez",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
   },
